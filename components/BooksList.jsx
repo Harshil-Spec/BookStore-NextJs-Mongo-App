@@ -4,7 +4,7 @@ import { HiPencilAlt } from "react-icons/hi";
 
 const getBooks = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/books`, {
+    const res = await fetch(`/api/books`, {
       cache: "no-store",
     });
 
