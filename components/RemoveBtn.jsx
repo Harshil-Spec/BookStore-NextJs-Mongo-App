@@ -1,10 +1,8 @@
 "use client";
 
 import { HiOutlineTrash } from "react-icons/hi";
-import { useRouter } from "next/navigation";
 
-export default function RemoveBtn({ id }) {
-  const router = useRouter();
+export default function RemoveBtn({ id, onDelete  }) {
   const removeBook = async () => {
     const confirmed = confirm("Are you sure?");
 
@@ -14,7 +12,7 @@ export default function RemoveBtn({ id }) {
       });
 
       if (res.ok) {
-        router.refresh();
+        onDelete(id);
       }
     }
   };

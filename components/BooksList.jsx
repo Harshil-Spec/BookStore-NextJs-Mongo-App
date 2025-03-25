@@ -1,10 +1,15 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import RemoveBtn from "./RemoveBtn";
 import { HiPencilAlt } from "react-icons/hi";
+import { GrPrevious } from "react-icons/gr";
+import { GrNext } from "react-icons/gr";
 
-const getBooks = async () => {
+const getBooks = async (page = 1, limit = 5) => {
   try {
-    const res = await fetch(`/api/books`, {
+    const res = await fetch(`/api/books?page=${page}&limit=${limit}`, {
       cache: "no-store",
     });
 
@@ -14,14 +19,40 @@ const getBooks = async () => {
 
     return await res.json();
   } catch (error) {
-    console.log("Error loading books: ", error);
-    return { books: [] }; 
+    console.error("Error loading books: ", error);
+    return { books: [], totalPages: 0, currentPage: 1 };
   }
 };
 
-export default async function BooksList() {
-  const data = await getBooks();
-  const books = data?.books ?? []; 
+export default function BooksList() {
+  const [books, setBooks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 5;
+
+  const fetchBooks = async (page = 1) => {
+    const data = await getBooks(page, limit);
+    setBooks(data?.books ?? []);
+    setTotalPages(data?.totalPages ?? 1);
+    setCurrentPage(data?.currentPage ?? 1);
+  };
+
+  useEffect(() => {
+    fetchBooks(currentPage);
+  }, [currentPage]);
+
+  // Handle delete and update books state
+  const handleDelete = (id) => {
+    setBooks((prevBooks) => prevBooks.filter((book) => book._id !== id));
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
   return (
     <div className="container mx-auto p-0">
       <h2 className="text-center text-2xl font-bold mb-2">Book List</h2>
@@ -40,9 +71,9 @@ export default async function BooksList() {
               books.map((book, index) => (
                 <tr key={book._id} className="bg-white hover:bg-gray-200">
                   <td className="p-3 border border-gray-600 text-center">
-                    {index + 1}
+                    {/* {index + 1} */}
+                    {(currentPage - 1) * limit + index + 1}
                   </td>
-
                   <td className="p-3 text-blue-900 border border-gray-600 text-center">
                     {book.title}
                   </td>
@@ -56,7 +87,7 @@ export default async function BooksList() {
                     >
                       <HiPencilAlt size={22} />
                     </Link>
-                    <RemoveBtn id={book._id} />
+                    <RemoveBtn id={book._id} onDelete={handleDelete} />
                   </td>
                 </tr>
               ))
@@ -69,6 +100,26 @@ export default async function BooksList() {
             )}
           </tbody>
         </table>
+      </div>
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center mt-4 gap-2">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="bg-blue-400 px-4 py-2 rounded disabled:opacity-50"
+        >
+          <GrPrevious/>
+        </button>
+        <span className="font-bold">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="bg-blue-400 px-4 py-2 rounded disabled:opacity-50"
+        >
+          <GrNext />
+        </button>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function AddBook() {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -16,7 +17,7 @@ export default function AddBook() {
       alert("Book Title and Author are required.");
       return;
     }
-
+    setLoading(true);
     try {
       const res = await fetch("/api/books", {
         method: "POST",
@@ -33,6 +34,8 @@ export default function AddBook() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,10 +60,10 @@ export default function AddBook() {
       <button
         type="submit"
         className="bg-blue-400 hover:bg-blue-600 font-bold text-white py-3 px-6 w-fit"
+        disabled={loading}
       >
-        Add Book
+        {loading ? "Adding..." : "Add Book"}
       </button>
     </form>
   );
 }
-

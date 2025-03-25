@@ -9,11 +9,27 @@ export async function POST(request) {
   return NextResponse.json({ message: "Book Created" }, { status: 201 });
 }
 
-export async function GET() {
+// export async function GET() {
+//   await connectMongoDB();
+//   const books = await Book.find();
+//   return NextResponse.json({ books });
+// }
+export async function GET(request) {
+  const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
+  const limit = parseInt(request.nextUrl.searchParams.get("limit") || "5");
+  const skip = (page - 1) * limit;
+
   await connectMongoDB();
-  const books = await Book.find();
-  return NextResponse.json({ books });
+  const books = await Book.find().skip(skip).limit(limit);
+  const totalBooks = await Book.countDocuments();
+
+  return NextResponse.json({
+    books,
+    totalPages: Math.ceil(totalBooks / limit),
+    currentPage: page,
+  });
 }
+
 
 export async function DELETE(request) {
   const id = request.nextUrl.searchParams.get("id");

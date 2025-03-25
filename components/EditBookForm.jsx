@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 export default function EditBookForm({ id, title, author }) {
   const [newTitle, setNewTitle] = useState(title);
   const [newAuthor, setNewAuthor] = useState(author);
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const res = await fetch(`/api/books/${id}`, {
@@ -29,6 +31,8 @@ export default function EditBookForm({ id, title, author }) {
       router.push("/");
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,8 +54,12 @@ export default function EditBookForm({ id, title, author }) {
         placeholder="Book Author"
       />
 
-      <button className="bg-blue-400 hover:bg-blue-600 font-bold text-white py-3 px-6 w-fit">
-        Update Book
+      <button
+        type="submit"
+        className="bg-blue-400 hover:bg-blue-600 font-bold text-white py-3 px-6 w-fit"
+        disabled={loading}
+      >
+        {loading ? "Updating..." : "Update Book"}
       </button>
     </form>
   );
