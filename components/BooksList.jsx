@@ -28,7 +28,7 @@ export default function BooksList() {
   const [books, setBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 5;
+  const limit = 10;
 
   const fetchBooks = async (page = 1) => {
     const data = await getBooks(page, limit);
@@ -87,7 +87,7 @@ export default function BooksList() {
                     >
                       <HiPencilAlt size={22} />
                     </Link>
-                    <RemoveBtn id={book._id} onDelete={handleDelete} />
+                    <RemoveBtn id={book._id} title={book.title} onDelete={handleDelete} />
                   </td>
                 </tr>
               ))

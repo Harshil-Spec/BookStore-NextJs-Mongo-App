@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function EditBookForm({ id, title, author }) {
   const [newTitle, setNewTitle] = useState(title);
@@ -26,11 +27,20 @@ export default function EditBookForm({ id, title, author }) {
       if (!res.ok) {
         throw new Error("Failed to update book");
       }
-
-      router.refresh();
-      router.push("/");
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Book updated successfully!",
+        confirmButtonColor: "#3085d6",
+      }).then(() => {
+        router.push("/");
+      });
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Something went wrong!",
+      });
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function AddBook() {
   const [title, setTitle] = useState("");
@@ -14,7 +15,12 @@ export default function AddBook() {
     e.preventDefault();
 
     if (!title || !author) {
-      alert("Book Title and Author are required.");
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Book Title and Author are required.",
+        confirmButtonColor: "#3085d6",
+      });
       return;
     }
     setLoading(true);
@@ -28,12 +34,23 @@ export default function AddBook() {
       });
 
       if (res.ok) {
-        router.push("/");
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Book added successfully!",
+          confirmButtonColor: "#3085d6",
+        }).then(() => {
+          router.push("/");
+        });
       } else {
         throw new Error("Failed to create a book");
       }
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Something went wrong!",
+      });
     } finally {
       setLoading(false);
     }
