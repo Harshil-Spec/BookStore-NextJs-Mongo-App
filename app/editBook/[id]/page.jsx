@@ -1,25 +1,45 @@
+"use client";
+
 import EditBookForm from "@/components/EditBookForm";
+import { use, useEffect, useState } from "react";
 
-const getBookById = async (id) => {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/books/${id}`, {
-      cache: "no-store",
-    });
+export default function EditBook({ params }) {
+  const { id } = use(params); 
+  const [books, setBook] = useState(null);
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch book");
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const res = await fetch(`/api/books/${id}`, {
+          cache: "no-store",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "GET",
+        });
+     
+        if (!res.ok) {
+          throw new Error("Failed to fetch book");
+        }
+
+        const bookData = await res.json(); 
+
+        setBook(bookData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (id) {
+      fetchBook();
     }
+  }, [id]);
 
-    return res.json();
-  } catch (error) {
-    console.log(error);
-  }
-};
+  if (!books) return <p>Loading...</p>;
+  return (
+  
 
-export default async function EditBook({ params }) {
-  const { id } = params;
-  const { book } = await getBookById(id);
-  const { title, author } = book;
-
-  return <EditBookForm id={id} title={title} author={author} />;
+      <EditBookForm id={id} title={books.title} author={books.author} />
+   
+  );
 }

@@ -14,5 +14,5 @@ export async function GET(request, { params }) {
   const { id } = params;
   await connectMongoDB();
   const book = await Book.findOne({ _id: id });
-  return NextResponse.json({ book }, { status: 200 });
+  return  NextResponse.json( book , { status: 200 });
 }
